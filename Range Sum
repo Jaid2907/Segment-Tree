@@ -1,0 +1,75 @@
+class SegTree
+{
+public:
+  vector<int> seg;
+  int n;
+
+  SegTree(int n)
+  {
+    this->n = n;
+    seg.resize(4 * n);
+  }
+
+  int build(int ind, int low, int high, vector<int> &arr)
+  {
+
+    if (low == high)
+    {
+      seg[ind] = arr[low];
+      return seg[ind];
+    }
+
+    int mid = (low + high) / 2;
+    int left = build(2 * ind + 1, low, mid, arr);
+    int right = build(2 * ind + 2, mid + 1, high, arr);
+
+    return seg[ind] = left + right;
+  }
+
+  void update(int ind, int low, int high, vector<int> &arr, int i, int val)
+  {
+    if (low == high)
+    {
+      arr[i] = val;
+      seg[ind] = val;
+      return;
+    }
+    int mid = (low + high) / 2;
+
+    if (i <= mid)
+      update(2 * ind + 1, low, mid, arr, i, val);
+    else
+      update(2 * ind + 2, mid + 1, high, arr, i, val);
+
+    seg[ind] = seg[2 * ind + 1] + seg[2 * ind + 2];
+  }
+  void display()
+  {
+    for (int i = 0; i < 4 * n; i++)
+    {
+      cout << seg[i] << " ";
+    }
+    cout << endl;
+  }
+
+  int query(int ind, int low, int high, vector<int> &arr, int l, int r)
+  {
+
+    int mid = (low + high) / 2;
+
+    // Complete Overlap
+    if (l <= low && high <= r)
+    {
+      return seg[ind];
+    }
+    // No Overlap
+    else if (high < l || low > r)
+    {
+      return 0;
+    } // Partial Overlap
+    else
+    {
+      return query(2 * ind + 1, low, mid, arr, l, r) + query(2 * ind + 2, mid + 1, high, arr, l, r);
+    }
+  }
+};
